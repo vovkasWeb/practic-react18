@@ -1,25 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
+import data from './data'
+import { useState, useMemo, useTransition, useDeferredValue } from 'react'
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+	const [text, setText] = useState('')
+	const [posts, setPosts] = useState(data)
+	// const defferedValue = useDeferredValue(text)
+	const [isPending, startTransitoion] = useTransition()
+
+	const filteredPosts = useMemo(() => {
+		return posts.filter(item => item.name.toLowerCase().includes(text))
+	}, [text])
+
+	const onValueChange = e => {
+    startTransitoion(()=>{
+      		setText(e.target.value)
+    })
+
+	}
+
+	return (
+		<>
+			<input value={text} type='text' onChange={onValueChange} />
+
+			<hr />
+
+			<div>
+				{isPending ? (
+					<h4>Loding..</h4>
+				) : (
+					filteredPosts.map(post => (
+						<div key={post._id}>
+							<h4>{post.name}</h4>
+						</div>
+					))
+				)}
+			</div>
+		</>
+	)
 }
 
-export default App;
+export default App
